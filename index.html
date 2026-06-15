@@ -53,7 +53,7 @@
         <div class="max-w-7xl mx-auto backdrop-blur-md bg-dark/40 border border-white/5 rounded-full px-6 py-3 flex items-center justify-between shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]">
             <div class="flex items-center gap-2">
                 <i class="ph-fill ph-sun text-accent text-2xl"></i>
-                <span class="font-bold text-xl tracking-tight">LME<span class="text-white/50 font-normal">.solar</span></span>
+                <span class="font-bold text-xl tracking-tight">LME - <span class="text-white/50 font-normal">Energia Solar</span></span>
             </div>
             
             <div class="hidden md:flex items-center gap-8 text-sm font-medium">
@@ -75,15 +75,21 @@
         <!-- Pinned Video & Hero Content -->
         <div class="sticky top-0 w-full h-screen overflow-hidden flex items-center justify-center">
             
-            <!-- Video Background -->
+            <!-- Video fallback + canvas frame sequence -->
             <video 
                 id="hero-video" 
-                class="absolute inset-0 w-full h-full object-cover origin-center scale-105"
+                class="hero-video-fallback absolute inset-0 w-full h-full object-cover origin-center scale-105"
                 muted 
                 playsinline 
-                preload="auto"
+                preload="metadata"
+                poster="assets/hero-frames/frame-000.webp"
                 src="video-hero-page.mp4">
             </video>
+            <canvas 
+                id="hero-canvas"
+                class="absolute inset-0 w-full h-full origin-center scale-105"
+                aria-hidden="true">
+            </canvas>
             
             <!-- Gradient Overlay for Readability -->
             <div class="absolute inset-0 bg-gradient-to-t from-dark via-dark/60 to-transparent"></div>
@@ -105,16 +111,6 @@
                     <p class="text-lg md:text-xl text-white/60 max-w-md font-light leading-relaxed opacity-0 animate-fade-in delay-500">
                         Projetos solares de alto desempenho projetados para maximizar seu retorno financeiro com elegância arquitetônica.
                     </p>
-                </div>
-                
-                <div class="hidden md:flex justify-end items-end h-full">
-                    <div class="glass-panel p-6 rounded-3xl w-2/3 backdrop-blur-xl border border-white/10 shadow-2xl relative translate-y-12">
-                        <div class="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center mb-4">
-                            <i class="ph ph-leaf text-primary text-2xl"></i>
-                        </div>
-                        <h3 class="text-2xl font-medium mb-2">ROI Acelerado</h3>
-                        <p class="text-white/50 text-sm">Nossos módulos fotovoltaicos garantem o retorno de investimento médio mais rápido do setor.</p>
-                    </div>
                 </div>
             </div>
             
@@ -142,6 +138,17 @@
                         <p class="text-sm font-medium text-white mb-1">Taxa de Eficiência</p>
                         <p class="text-xs text-white/40">Inversores de última geração minimizam as perdas de conversão elétrica.</p>
                     </div>
+                    
+                    <div class="hidden md:flex justify-end items-end h-full">
+                        <div class="glass-panel p-6 rounded-3xl w-2/3 backdrop-blur-xl border border-white/10 shadow-2xl relative translate-y-12">
+                            <div class="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center mb-4">
+                                <i class="ph ph-leaf text-primary text-2xl"></i>
+                            </div>
+                            <h3 class="text-2xl font-medium mb-2">ROI Acelerado</h3>
+                            <p class="text-white/50 text-sm">Nossos módulos fotovoltaicos garantem o retorno de investimento médio mais rápido do setor.</p>
+                        </div>
+                    </div>
+
                     <div class="border border-white/5 bg-white/[0.02] p-8 rounded-3xl hover:bg-white/[0.04] transition-colors">
                         <h4 class="text-4xl font-light text-secondary mb-2">25<span class="text-xl"> anos</span></h4>
                         <p class="text-sm font-medium text-white mb-1">Garantia Estrutural</p>
