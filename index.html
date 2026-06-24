@@ -8,6 +8,7 @@
     <!-- Google Fonts: Outfit -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="shortcut icon" href="imagens/favicon/favicon.ico" type="image/x-icon">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
     <!-- Tailwind CSS (CDN) -->
@@ -98,10 +99,6 @@
             <!-- Asymmetric Hero Content -->
             <div class="relative z-10 w-full max-w-7xl mx-auto px-6 grid md:grid-cols-2 gap-12 items-center">
                 <div class="flex flex-col gap-6">
-                    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-primary/30 bg-primary/10 w-max">
-                        <span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
-                        <span class="text-xs font-semibold text-primary uppercase tracking-widest">O futuro é limpo</span>
-                    </div>
                     <h1 class="text-5xl md:text-7xl font-semibold tracking-tighter leading-[0.9] title-reveal">
                         A energia do <br/> 
                         <span class="text-accent italic font-light">amanhã,</span><br/>
@@ -176,38 +173,37 @@
                 
                 <!-- Project 1 (Large) -->
                 <div class="md:col-span-2 md:row-span-2 border border-white/10 rounded-[2.5rem] overflow-hidden group relative bg-zinc-900">
-                    <img src="https://picsum.photos/seed/residencial/800/800" alt="Projeto Residencial Alto Padrão" class="absolute inset-0 w-full h-full object-cover opacity-60 group-hover:scale-105 group-hover:opacity-80 transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)]">
+                    <img src="imagens/projeto1.jpg" alt="Projeto Residencial Alto Padrão" class="absolute inset-0 w-full h-full object-cover opacity-60 group-hover:scale-105 group-hover:opacity-80 transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)]">
                     <div class="absolute inset-0 bg-gradient-to-t from-dark/90 via-dark/20 to-transparent"></div>
                     <div class="absolute bottom-0 left-0 p-8 w-full">
                         <div class="flex items-center gap-3 mb-3">
                             <span class="px-3 py-1 rounded-full border border-white/20 bg-white/10 backdrop-blur-md text-xs font-medium">Residencial</span>
-                            <span class="text-white/60 text-xs">8.5 kWp</span>
                         </div>
-                        <h3 class="text-2xl font-medium mb-2">Residência Alpha</h3>
+                        <h3 class="text-2xl font-medium mb-2">Residencial</h3>
                         <p class="text-sm text-white/60 max-w-md">Instalação integrada ao telhado com painéis all-black, reduzindo 95% da fatura mantendo a arquitetura moderna.</p>
                     </div>
                 </div>
 
                 <!-- Project 2 -->
                 <div class="border border-white/10 rounded-[2.5rem] overflow-hidden group relative bg-zinc-900">
-                    <img src="https://picsum.photos/seed/comercial/400/600" alt="Projeto Comercial" class="absolute inset-0 w-full h-full object-cover opacity-60 group-hover:scale-105 group-hover:opacity-80 transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)]">
+                    <img src="imagens/projeto2.jpg" alt="Projeto Comercial" class="absolute inset-0 w-full h-full object-cover opacity-60 group-hover:scale-105 group-hover:opacity-80 transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)]">
                     <div class="absolute inset-0 bg-gradient-to-t from-dark/90 to-transparent"></div>
                     <div class="absolute bottom-0 left-0 p-6 w-full transform group-hover:-translate-y-2 transition-transform duration-500">
-                        <span class="text-[10px] text-accent uppercase tracking-widest font-bold mb-1 block">Comercial</span>
-                        <h3 class="text-lg font-medium">Fábrica Têxtil</h3>
-                        <p class="text-xs text-white/50 mt-2 opacity-0 group-hover:opacity-100 transition-opacity">Usina de solo para suportar maquinário pesado 24h.</p>
+                        <span class="text-[10px] text-accent uppercase tracking-widest font-bold mb-1 block">Agronegócio</span>
+                        <h3 class="text-lg font-medium">Casas de Campo</h3>
+                        <p class="text-xs text-white/50 mt-2 opacity-0 group-hover:opacity-100 transition-opacity">Painéis em ambientes rurais, </p>
                     </div>
                 </div>
 
                 <!-- Project 3 -->
-                <div class="border border-white/10 rounded-[2.5rem] overflow-hidden group relative bg-zinc-900 flex flex-col justify-end p-6">
-                    <!-- Abstract representation instead of image to break monotony -->
-                    <div class="absolute top-6 right-6">
-                        <i class="ph-light ph-solar-panel text-secondary text-4xl opacity-50 group-hover:opacity-100 group-hover:rotate-12 transition-all duration-500"></i>
+                <div class="border border-white/10 rounded-[2.5rem] overflow-hidden group relative bg-zinc-900">
+                    <img src="imagens/projeto3.jpg" alt="Projeto Comercial" class="absolute inset-0 w-full h-full object-cover opacity-60 group-hover:scale-105 group-hover:opacity-80 transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)]">
+                    <div class="absolute inset-0 bg-gradient-to-t from-dark/90 to-transparent"></div>
+                    <div class="absolute bottom-0 left-0 p-6 w-full transform group-hover:-translate-y-2 transition-transform duration-500">
+                        <span class="text-[10px] text-accent uppercase tracking-widest font-bold mb-1 block">Empresas</span>
+                        <h3 class="text-lg font-medium">Edifício Corporate</h3>
+                        <p class="text-xs text-white/50 mt-2 opacity-0 group-hover:opacity-100 transition-opacity">Ambientes corporativos com soluções de energia solar integradas.</p>
                     </div>
-                    <span class="text-[10px] text-primary w-fit uppercase tracking-widest font-bold mb-1 border border-primary/30 px-2 py-0.5 rounded-full">Agronegócio</span>
-                    <h3 class="text-lg font-medium mt-4">Fazenda Vale</h3>
-                    <p class="text-xs text-white/50 mt-2 leading-relaxed">Sistema de bombeamento solar off-grid, garantindo irrigação constante sem dependência da rede elétrica rural.</p>
                 </div>
                 
             </div>
@@ -221,26 +217,26 @@
         
         <div class="max-w-4xl mx-auto px-6 relative z-10 text-center">
             <h2 class="text-4xl md:text-5xl font-medium tracking-tight mb-6">Como desenhamos seu projeto</h2>
-            <p class="text-white/60 mb-16 max-w-xl mx-auto font-light leading-relaxed">O processo rumo à independência energética é simples, transparente e focado em engenharia de dados.</p>
+            <p class="text-white/60 mb-16 max-w-xl mx-auto font-light leading-relaxed">O processo rumo à independência energética é simples e transparente.</p>
             
             <div class="grid md:grid-cols-3 gap-4 mb-20 text-left">
                 <!-- Step 1 -->
                 <div class="p-6 rounded-3xl bg-white/5 border border-white/10 hover:border-accent/40 transition-colors">
                     <div class="w-10 h-10 rounded-full bg-accent/20 flex items-center justify-center text-accent font-bold mb-4">1</div>
                     <h4 class="font-medium mb-2">Engenharia Inicial</h4>
-                    <p class="text-sm text-white/50">Analisamos sua fatura de energia e o modelo arquitetônico da propriedade para cálculo estrutural.</p>
+                    <p class="text-sm text-white/50">Analisamos sua fatura de energia e o modelo da propriedade para cálculo estrutural.</p>
                 </div>
                 <!-- Step 2 -->
                 <div class="p-6 rounded-3xl bg-white/5 border border-white/10 hover:border-primary/40 transition-colors">
                     <div class="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center text-primary font-bold mb-4">2</div>
                     <h4 class="font-medium mb-2">Simulação de Geração</h4>
-                    <p class="text-sm text-white/50">Desenvolvemos o layout 3D mostrando a disposição exata dos módulos e a projeção de economia.</p>
+                    <p class="text-sm text-white/50">Criamos uma simulação detalhada da geração de energia com base em seu consumo e localização.</p>
                 </div>
                 <!-- Step 3 -->
                 <div class="p-6 rounded-3xl bg-white/5 border border-white/10 hover:border-secondary/40 transition-colors">
                     <div class="w-10 h-10 rounded-full bg-secondary/20 flex items-center justify-center text-secondary font-bold mb-4">3</div>
                     <h4 class="font-medium mb-2">Instalação & Ativação</h4>
-                    <p class="text-sm text-white/50">Equipe própria homologa o sistema e finaliza a troca do relógio junto à concessionária.</p>
+                    <p class="text-sm text-white/50">O processo todo é realizado por especialistas, garantindo qualidade e segurança.</p>
                 </div>
             </div>
 
@@ -253,9 +249,6 @@
                 <form class="relative z-10 w-full max-w-md flex flex-col gap-4">
                     <div class="flex gap-2 p-1.5 rounded-full bg-white/5 border border-white/10 focus-within:border-accent/50 focus-within:bg-white/10 transition-all">
                         <input type="text" placeholder="Seu nome" class="bg-transparent text-sm w-full px-4 outline-none text-white placeholder:text-white/30">
-                    </div>
-                    <div class="flex gap-2 p-1.5 rounded-full bg-white/5 border border-white/10 focus-within:border-accent/50 focus-within:bg-white/10 transition-all">
-                        <input type="email" placeholder="seu@email.com" class="bg-transparent text-sm w-full px-4 outline-none text-white placeholder:text-white/30">
                     </div>
                     <div class="flex gap-2 p-1.5 rounded-full bg-white/5 border border-white/10 focus-within:border-accent/50 focus-within:bg-white/10 transition-all">
                         <input type="tel" placeholder="Telefone / WhatsApp" class="bg-transparent text-sm w-full px-4 outline-none text-white placeholder:text-white/30">
@@ -274,12 +267,11 @@
         <div class="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-6">
             <div class="flex items-center gap-2">
                 <i class="ph-fill ph-sun text-accent text-xl"></i>
-                <span class="font-bold tracking-tight">LME<span class="text-white/50 font-normal">.solar</span></span>
+                <span class="font-bold tracking-tight">LME</span>
             </div>
             <p class="text-xs text-white/40">&copy; 2026 LME Energia Solar. Todos os direitos reservados.</p>
             <div class="flex gap-4">
-                <a href="#" class="text-white/40 hover:text-white transition-colors"><i class="ph ph-instagram-logo text-xl"></i></a>
-                <a href="#" class="text-white/40 hover:text-white transition-colors"><i class="ph ph-linkedin-logo text-xl"></i></a>
+                <a href="https://www.instagram.com/lme_energiasolar/" target="_blank" class="text-white/40 hover:text-white transition-colors"><i class="ph ph-instagram-logo text-xl"></i></a>
                 <a href="#" class="text-white/40 hover:text-white transition-colors"><i class="ph ph-whatsapp-logo text-xl"></i></a>
             </div>
         </div>
