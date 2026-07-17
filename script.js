@@ -1,77 +1,188 @@
-// GSAP & ScrollTrigger Setup
+'use strict';
+
+const HERO_FRAME_COUNT = 121;
+const HERO_FRAME_PATH = 'assets/hero-frames';
+const HERO_PRELOAD_RADIUS = 6;
+const MAX_CONCURRENT_FRAME_LOADS = 6;
+const MAX_CANVAS_PIXEL_RATIO = 2;
+const NAVBAR_SCROLL_THRESHOLD = 50;
+
 gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
 
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener('DOMContentLoaded', initializePage);
 
-    // --- 1. Canvas Video Scroll Sequence ---
+function initializePage() {
     const heroCanvas = document.getElementById('hero-canvas');
-    const videoContainer = document.getElementById('video-sequence');
+    const heroSequence = document.getElementById('video-sequence');
 
-    setupHeroFrameScroll(heroCanvas, videoContainer);
+    setupHeroFrameScroll(heroCanvas, heroSequence);
+    setupTitleReveal();
+    setupNavbar();
+    setupComparisonReveal();
+}
 
-    // --- 2. Title Reveal ---
-    gsap.fromTo(".title-reveal",
+function setupTitleReveal() {
+    gsap.fromTo(
+        '.title-reveal',
         { y: 50, opacity: 0 },
-        { y: 0, opacity: 1, duration: 1.5, ease: "power4.out", stagger: 0.2 }
+        {
+            y: 0,
+            opacity: 1,
+            duration: 1.5,
+            ease: 'power4.out',
+            stagger: 0.2
+        }
     );
+}
 
-    // --- 3. Navbar Background Scroll Effect ---
+function setupNavbar() {
     const navbar = document.getElementById('navbar');
-    window.addEventListener('scroll', () => {
-        if (window.scrollY > 50) {
-            navbar.classList.add('bg-dark/80');
-            navbar.classList.remove('bg-dark/40');
-        } else {
-            navbar.classList.add('bg-dark/40');
-            navbar.classList.remove('bg-dark/80');
+
+    if (!navbar) return;
+
+    const updateNavbarState = () => {
+        navbar.classList.toggle(
+            'is-scrolled',
+            window.scrollY > NAVBAR_SCROLL_THRESHOLD
+        );
+    };
+
+    updateNavbarState();
+    window.addEventListener('scroll', updateNavbarState, { passive: true });
+}
+
+function setupComparisonReveal() {
+    const section = document.querySelector('.comparison-section');
+
+    if (!section) return;
+
+    const prefersReducedMotion = window.matchMedia(
+        '(prefers-reduced-motion: reduce)'
+    ).matches;
+
+    if (prefersReducedMotion) {
+        section.classList.add('is-visible');
+        return;
+    }
+
+    const timeline = gsap.timeline({
+        scrollTrigger: {
+            trigger: section,
+            start: 'top 72%',
+            once: true
         }
     });
-});
+
+    timeline
+        .fromTo(
+            '.comparison-header > *',
+            { y: 28, opacity: 0 },
+            {
+                y: 0,
+                opacity: 1,
+                duration: 0.75,
+                stagger: 0.1,
+                ease: 'power3.out'
+            }
+        )
+        .fromTo(
+            '.comparison-card--advantages',
+            { x: -56, y: 20, opacity: 0, rotateY: -3 },
+            {
+                x: 0,
+                y: 0,
+                opacity: 1,
+                rotateY: 0,
+                duration: 0.9,
+                ease: 'power3.out'
+            },
+            '-=0.35'
+        )
+        .fromTo(
+            '.comparison-card--disadvantages',
+            { x: 56, y: 20, opacity: 0, rotateY: 3 },
+            {
+                x: 0,
+                y: 0,
+                opacity: 1,
+                rotateY: 0,
+                duration: 0.9,
+                ease: 'power3.out'
+            },
+            '<0.1'
+        )
+        .fromTo(
+            '.comparison-list li',
+            { y: 18, opacity: 0 },
+            {
+                y: 0,
+                opacity: 1,
+                duration: 0.55,
+                stagger: 0.075,
+                ease: 'power2.out'
+            },
+            '-=0.5'
+        )
+        .add(() => section.classList.add('is-visible'));
+}
 
 function setupHeroFrameScroll(canvas, container) {
     if (!canvas || !container) return;
 
-    const FRAME_COUNT = 121;
-    const MAX_CONCURRENT_LOADS = 6;
-    const FRAME_BASE_PATH = 'assets/hero-frames';
-    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const context = canvas.getContext('2d', { alpha: false });
-    const frames = Array.from({ length: FRAME_COUNT }, () => ({
+
+    if (!context) return;
+
+    const prefersReducedMotion = window.matchMedia(
+        '(prefers-reduced-motion: reduce)'
+    ).matches;
+    const frames = Array.from({ length: HERO_FRAME_COUNT }, () => ({
         image: null,
         job: null,
         promise: null,
         status: 'idle'
     }));
-    const queue = [];
+    const loadQueue = [];
 
     let activeLoads = 0;
-    let desiredFrame = 0;
-    let drawnFrame = -1;
-    let rafId = 0;
+    let desiredFrameIndex = 0;
+    let renderedFrameIndex = -1;
+    let animationFrameId = 0;
     let forceRedraw = false;
 
-    const frameUrl = (index) => `${FRAME_BASE_PATH}/frame-${String(index).padStart(3, '0')}.webp`;
-    const clampFrame = (index) => Math.min(FRAME_COUNT - 1, Math.max(0, index));
-    const progressToFrame = (progress) => clampFrame(Math.round(progress * (FRAME_COUNT - 1)));
+    const clampFrameIndex = (index) =>
+        Math.min(HERO_FRAME_COUNT - 1, Math.max(0, index));
 
-    function pumpQueue() {
-        while (activeLoads < MAX_CONCURRENT_LOADS && queue.length) {
-            const job = queue.shift();
+    const getFrameUrl = (index) =>
+        `${HERO_FRAME_PATH}/frame-${String(index).padStart(3, '0')}.webp`;
+
+    const progressToFrameIndex = (progress) =>
+        clampFrameIndex(Math.round(progress * (HERO_FRAME_COUNT - 1)));
+
+    // Starts only a small number of image requests at once to avoid saturating the browser.
+    function processLoadQueue() {
+        while (
+            activeLoads < MAX_CONCURRENT_FRAME_LOADS &&
+            loadQueue.length > 0
+        ) {
+            const job = loadQueue.shift();
+
             activeLoads += 1;
             job.start();
         }
     }
 
     function prioritizeQueuedFrame(index) {
-        const position = queue.findIndex((job) => job.index === index);
-        if (position <= 0) return;
+        const queuePosition = loadQueue.findIndex((job) => job.index === index);
 
-        const [job] = queue.splice(position, 1);
-        queue.unshift(job);
+        if (queuePosition <= 0) return;
+
+        const [job] = loadQueue.splice(queuePosition, 1);
+        loadQueue.unshift(job);
     }
 
     function loadFrame(index, priority = false) {
-        const safeIndex = clampFrame(index);
+        const safeIndex = clampFrameIndex(index);
         const frame = frames[safeIndex];
 
         if (frame.status === 'loaded' || frame.status === 'loading') {
@@ -88,49 +199,54 @@ function setupHeroFrameScroll(canvas, container) {
             frame.job = {
                 index: safeIndex,
                 start: () => {
-                    frame.status = 'loading';
-
                     const image = new Image();
+
+                    frame.status = 'loading';
                     image.decoding = 'async';
 
-                    image.onload = () => {
-                        const decode = image.decode ? image.decode().catch(() => null) : Promise.resolve();
+                    image.onload = async () => {
+                        if (image.decode) {
+                            await image.decode().catch(() => null);
+                        }
 
-                        decode.then(() => {
-                            frame.image = image;
-                            frame.status = 'loaded';
-                            activeLoads -= 1;
-                            resolve(image);
-                            pumpQueue();
-                            requestDraw();
-                        });
+                        frame.image = image;
+                        frame.status = 'loaded';
+                        activeLoads -= 1;
+
+                        resolve(image);
+                        processLoadQueue();
+                        requestRender();
                     };
 
                     image.onerror = () => {
                         frame.status = 'error';
                         activeLoads -= 1;
+
                         reject(new Error(`Unable to load hero frame ${safeIndex}`));
-                        pumpQueue();
+                        processLoadQueue();
                     };
 
-                    image.src = frameUrl(safeIndex);
+                    image.src = getFrameUrl(safeIndex);
                 }
             };
 
             if (priority) {
-                queue.unshift(frame.job);
+                loadQueue.unshift(frame.job);
             } else {
-                queue.push(frame.job);
+                loadQueue.push(frame.job);
             }
 
-            pumpQueue();
+            processLoadQueue();
         });
 
         return frame.promise;
     }
 
     function resizeCanvas() {
-        const pixelRatio = Math.min(window.devicePixelRatio || 1, 2);
+        const pixelRatio = Math.min(
+            window.devicePixelRatio || 1,
+            MAX_CANVAS_PIXEL_RATIO
+        );
         const width = Math.max(1, Math.ceil(canvas.clientWidth * pixelRatio));
         const height = Math.max(1, Math.ceil(canvas.clientHeight * pixelRatio));
 
@@ -142,10 +258,14 @@ function setupHeroFrameScroll(canvas, container) {
         context.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
     }
 
-    function drawCover(image) {
+    // Draws the image using the same crop behavior as object-fit: cover.
+    function drawFrameCover(image) {
         const width = canvas.clientWidth;
         const height = canvas.clientHeight;
-        const scale = Math.max(width / image.naturalWidth, height / image.naturalHeight);
+        const scale = Math.max(
+            width / image.naturalWidth,
+            height / image.naturalHeight
+        );
         const drawWidth = image.naturalWidth * scale;
         const drawHeight = image.naturalHeight * scale;
         const drawX = (width - drawWidth) / 2;
@@ -156,85 +276,95 @@ function setupHeroFrameScroll(canvas, container) {
         context.drawImage(image, drawX, drawY, drawWidth, drawHeight);
     }
 
-    function nearestLoadedFrame(index) {
-        for (let offset = 0; offset < FRAME_COUNT; offset += 1) {
-            const before = frames[index - offset];
-            const after = frames[index + offset];
+    // Keeps a nearby loaded frame visible while the exact target is still decoding.
+    function findNearestLoadedFrame(index) {
+        for (let offset = 0; offset < HERO_FRAME_COUNT; offset += 1) {
+            const previousFrame = frames[index - offset];
+            const nextFrame = frames[index + offset];
 
-            if (before?.status === 'loaded') return index - offset;
-            if (after?.status === 'loaded') return index + offset;
+            if (previousFrame?.status === 'loaded') return index - offset;
+            if (nextFrame?.status === 'loaded') return index + offset;
         }
 
         return -1;
     }
 
-    function warmFrameWindow(index) {
-        for (let offset = 0; offset <= 6; offset += 1) {
+    function preloadAdjacentFrames(index) {
+        for (let offset = 0; offset <= HERO_PRELOAD_RADIUS; offset += 1) {
             loadFrame(index + offset, true).catch(() => null);
-            if (offset > 0) loadFrame(index - offset, true).catch(() => null);
+
+            if (offset > 0) {
+                loadFrame(index - offset, true).catch(() => null);
+            }
         }
     }
 
-    function requestDraw() {
-        if (rafId) return;
+    // Coalesces rapid scroll updates into one canvas draw per animation frame.
+    function requestRender() {
+        if (animationFrameId) return;
 
-        rafId = requestAnimationFrame(() => {
-            rafId = 0;
+        animationFrameId = requestAnimationFrame(() => {
+            animationFrameId = 0;
             renderFrame();
         });
     }
 
     function renderFrame() {
-        const frame = frames[desiredFrame];
+        const desiredFrame = frames[desiredFrameIndex];
 
-        if (frame.status !== 'loaded') {
-            loadFrame(desiredFrame, true).catch(() => null);
-            warmFrameWindow(desiredFrame);
+        if (desiredFrame.status !== 'loaded') {
+            loadFrame(desiredFrameIndex, true).catch(() => null);
+            preloadAdjacentFrames(desiredFrameIndex);
         }
 
-        const renderIndex = frame.status === 'loaded'
-            ? desiredFrame
-            : nearestLoadedFrame(desiredFrame);
+        const frameIndexToRender =
+            desiredFrame.status === 'loaded'
+                ? desiredFrameIndex
+                : findNearestLoadedFrame(desiredFrameIndex);
 
-        if (renderIndex === -1 || (renderIndex === drawnFrame && !forceRedraw)) return;
+        const frameAlreadyRendered =
+            frameIndexToRender === renderedFrameIndex && !forceRedraw;
 
-        drawCover(frames[renderIndex].image);
-        drawnFrame = renderIndex;
+        if (frameIndexToRender === -1 || frameAlreadyRendered) return;
+
+        drawFrameCover(frames[frameIndexToRender].image);
+        renderedFrameIndex = frameIndexToRender;
         forceRedraw = false;
         canvas.classList.add('is-ready');
     }
 
-    function requestResizeDraw() {
+    function requestResizeRender() {
         forceRedraw = true;
-        requestDraw();
+        requestRender();
     }
 
     function setDesiredFrame(index) {
-        desiredFrame = clampFrame(index);
-        warmFrameWindow(desiredFrame);
-        requestDraw();
+        desiredFrameIndex = clampFrameIndex(index);
+        preloadAdjacentFrames(desiredFrameIndex);
+        requestRender();
     }
 
+    // The first frame activates the canvas. The remaining frames load progressively.
     loadFrame(0, true)
         .then(() => {
             setDesiredFrame(0);
 
             if (prefersReducedMotion) return;
 
-            const heroTrigger = ScrollTrigger.create({
+            const heroScrollTrigger = ScrollTrigger.create({
                 trigger: container,
-                start: "top top",
-                end: "bottom bottom",
+                start: 'top top',
+                end: 'bottom bottom',
                 invalidateOnRefresh: true,
-                onUpdate: (self) => {
-                    setDesiredFrame(progressToFrame(self.progress));
+                onUpdate: ({ progress }) => {
+                    setDesiredFrame(progressToFrameIndex(progress));
                 }
             });
 
-            setDesiredFrame(progressToFrame(heroTrigger.progress));
-            loadFrame(FRAME_COUNT - 1, true).catch(() => null);
+            setDesiredFrame(progressToFrameIndex(heroScrollTrigger.progress));
+            loadFrame(HERO_FRAME_COUNT - 1, true).catch(() => null);
 
-            for (let index = 1; index < FRAME_COUNT - 1; index += 1) {
+            for (let index = 1; index < HERO_FRAME_COUNT - 1; index += 1) {
                 loadFrame(index).catch(() => null);
             }
         })
@@ -242,33 +372,34 @@ function setupHeroFrameScroll(canvas, container) {
             console.warn(error);
         });
 
-    window.addEventListener('resize', requestResizeDraw, { passive: true });
+    window.addEventListener('resize', requestResizeRender, { passive: true });
 }
 
-// --- 4. Sun Flash Transition to Budget Section ---
-window.triggerSunTransition = function () {
-    const flash = document.getElementById('sun-flash');
+function triggerSunTransition() {
+    const flashOverlay = document.getElementById('sun-flash');
 
-    const tl = gsap.timeline();
+    if (!flashOverlay) return;
 
-    // Bright flash expanding
-    tl.to(flash, {
-        opacity: 1,
-        duration: 0.4,
-        ease: "power2.in"
-    })
-        // Immediately scroll to budget section while blinded
+    const timeline = gsap.timeline();
+
+    timeline
+        .to(flashOverlay, {
+            opacity: 1,
+            duration: 0.2,
+            ease: 'power2.in'
+        })
         .add(() => {
             gsap.to(window, {
                 duration: 0,
-                scrollTo: { y: "#budget", offsetY: 50 }
+                scrollTo: { y: '#budget', offsetY: 50 }
             });
         })
-        // Gently fade out the flash
-        .to(flash, {
+        .to(flashOverlay, {
             opacity: 0,
-            duration: 1.5,
-            ease: "power2.out",
-            delay: 0.1
+            duration: 0.8,
+            ease: 'power2.out',
+            delay: 0
         });
-};
+}
+
+window.triggerSunTransition = triggerSunTransition;
