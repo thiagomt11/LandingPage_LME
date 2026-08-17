@@ -59,6 +59,7 @@ function setupComparisonReveal() {
     const prefersReducedMotion = window.matchMedia(
         '(prefers-reduced-motion: reduce)'
     ).matches;
+    const isCompactViewport = window.matchMedia('(max-width: 767px)').matches;
 
     if (prefersReducedMotion) {
         section.classList.add('is-visible');
@@ -87,7 +88,12 @@ function setupComparisonReveal() {
         )
         .fromTo(
             '.comparison-card--advantages',
-            { x: -56, y: 20, opacity: 0, rotateY: -3 },
+            {
+                x: isCompactViewport ? -18 : -56,
+                y: isCompactViewport ? 34 : 20,
+                opacity: 0,
+                rotateY: isCompactViewport ? 0 : -3
+            },
             {
                 x: 0,
                 y: 0,
@@ -100,7 +106,12 @@ function setupComparisonReveal() {
         )
         .fromTo(
             '.comparison-card--disadvantages',
-            { x: 56, y: 20, opacity: 0, rotateY: 3 },
+            {
+                x: isCompactViewport ? 18 : 56,
+                y: isCompactViewport ? 34 : 20,
+                opacity: 0,
+                rotateY: isCompactViewport ? 0 : 3
+            },
             {
                 x: 0,
                 y: 0,
@@ -136,6 +147,11 @@ function setupHeroFrameScroll(canvas, container) {
     const prefersReducedMotion = window.matchMedia(
         '(prefers-reduced-motion: reduce)'
     ).matches;
+    const isCompactDevice = window.matchMedia('(max-width: 767px)').matches;
+    const preloadRadius = isCompactDevice ? 4 : HERO_PRELOAD_RADIUS;
+    const concurrentFrameLoadLimit = isCompactDevice
+        ? 4
+        : MAX_CONCURRENT_FRAME_LOADS;
     const frames = Array.from({ length: HERO_FRAME_COUNT }, () => ({
         image: null,
         job: null,
@@ -162,7 +178,7 @@ function setupHeroFrameScroll(canvas, container) {
     // Starts only a small number of image requests at once to avoid saturating the browser.
     function processLoadQueue() {
         while (
-            activeLoads < MAX_CONCURRENT_FRAME_LOADS &&
+            activeLoads < concurrentFrameLoadLimit &&
             loadQueue.length > 0
         ) {
             const job = loadQueue.shift();
@@ -243,9 +259,12 @@ function setupHeroFrameScroll(canvas, container) {
     }
 
     function resizeCanvas() {
+        const viewportPixelRatioLimit = window.innerWidth <= 767
+            ? 1.5
+            : MAX_CANVAS_PIXEL_RATIO;
         const pixelRatio = Math.min(
             window.devicePixelRatio || 1,
-            MAX_CANVAS_PIXEL_RATIO
+            viewportPixelRatioLimit
         );
         const width = Math.max(1, Math.ceil(canvas.clientWidth * pixelRatio));
         const height = Math.max(1, Math.ceil(canvas.clientHeight * pixelRatio));
@@ -290,7 +309,7 @@ function setupHeroFrameScroll(canvas, container) {
     }
 
     function preloadAdjacentFrames(index) {
-        for (let offset = 0; offset <= HERO_PRELOAD_RADIUS; offset += 1) {
+        for (let offset = 0; offset <= preloadRadius; offset += 1) {
             loadFrame(index + offset, true).catch(() => null);
 
             if (offset > 0) {
